@@ -13,10 +13,9 @@ class RoleField(serializers.RelatedField):
     def to_representation(self, value):
         return value.name
     def to_internal_value(self, data):
-        
         try:
             try:
-                return Role.objects.get(name=name)
+                return Role.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -42,12 +41,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("id", "email", "password", "role")
     
     def create(self, validated_data):
+        try:
+            User.objects.get(email=validated_data["email"])
+        except:
+            raise serializers.ValidationError("User alredy exist")
         user = User.objects.create(
             role=validated_data['role'],
             email=validated_data['email'],
             password = make_password(validated_data['password'])
         )
-        user.set_password(validated_data['password'])
+        #user.password = validated_data['password']
         user.save()
         return user
 
