@@ -84,22 +84,22 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR + '/db.sqlite3',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
-# DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.mysql',
-#          'NAME': 'itemsapi$etu',
-#          'USER': 'itemsapi',
-#          'PASSWORD': 'Dagad582#',         
-#          'HOST': 'itemsapi.mysql.pythonanywhere-services.com'
-#      }
-# }
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',
+         'NAME': 'itemsapi$etu',
+         'USER': 'itemsapi',
+         'PASSWORD': 'Dagad582#',
+         'HOST': 'itemsapi.mysql.pythonanywhere-services.com'
+     }
+}
 
 
 # Password validation
@@ -139,7 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-SITE_ROOT = "/home/itemsapi/ETU/static"
+STATIC_ROOT = "/home/itemsapi/ETU/static"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 

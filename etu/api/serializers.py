@@ -29,7 +29,7 @@ class RoleField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
-class RoleSerializer(serializers.ModelSerializer):    
+class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ("id", "name")
@@ -39,12 +39,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "email", "password", "role")
-    
+
     def create(self, validated_data):
-        try:
-            User.objects.get(email=validated_data["email"])
-        except:
-            raise serializers.ValidationError("User alredy exist")
+        users = User.objects.filter(email=validated_data["email"])
+        if len(users) > 0:
+            return {"error": "User alredy exist"}
         user = User.objects.create(
             role=validated_data['role'],
             email=validated_data['email'],
@@ -75,12 +74,12 @@ class AddressField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
-class AddressSerializer(serializers.ModelSerializer):    
+class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ("id", "name")
 
-class TypeField(serializers.RelatedField):    
+class TypeField(serializers.RelatedField):
     queryset = Type.objects.all()
     def to_representation(self, value):
         return value.name
@@ -103,12 +102,12 @@ class TypeField(serializers.RelatedField):
             )
 
 
-class TypeSerializer(serializers.ModelSerializer):    
+class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
         fields = ("id", "name")
 
-class ProviderField(serializers.RelatedField):    
+class ProviderField(serializers.RelatedField):
     queryset = Provider.objects.all()
     def to_representation(self, value):
         return value.name
@@ -129,18 +128,18 @@ class ProviderField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
-class ProviderSerializer(serializers.ModelSerializer):    
+class ProviderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provider
         fields = ("id", "name")
-        
 
-class ConditionSerializer(serializers.ModelSerializer):    
+
+class ConditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Condition
         fields = ("id", "name")
 
-class ConditionField(serializers.RelatedField):    
+class ConditionField(serializers.RelatedField):
     queryset = Condition.objects.all()
     def to_representation(self, value):
         return value.name
@@ -162,7 +161,7 @@ class ConditionField(serializers.RelatedField):
             )
 
 
-class ItemSerializer(serializers.ModelSerializer):    
+class ItemSerializer(serializers.ModelSerializer):
     provider = ProviderField(many=False, read_only=False)
     address = AddressField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
