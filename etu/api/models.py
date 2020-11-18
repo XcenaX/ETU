@@ -42,6 +42,7 @@ class Condition(models.Model):
         return self.name
 
 class Item(models.Model):
+    image = models.ImageField(upload_to="items_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     condition = models.ForeignKey(Condition, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  

@@ -13,10 +13,10 @@ class RoleField(serializers.RelatedField):
     def to_representation(self, value):
         return value.name
     def to_internal_value(self, data):
+        
         try:
             try:
-                item_id = int(data['id'])
-                return Role.objects.get(id=item_id)
+                return Role.objects.get(name=name)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -58,8 +58,7 @@ class AddressField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                item_id = int(data['id'])
-                return Address.objects.get(id=item_id)
+                return Address.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -83,10 +82,10 @@ class TypeField(serializers.RelatedField):
     def to_representation(self, value):
         return value.name
     def to_internal_value(self, data):
+        print(data)
         try:
             try:
-                item_id = int(data['id'])
-                return Type.objects.get(id=item_id)
+                return Type.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -113,8 +112,7 @@ class ProviderField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                item_id = int(data['id'])
-                return Provider.objects.get(id=item_id)
+                return Provider.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -146,8 +144,7 @@ class ConditionField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                item_id = int(data['id'])
-                return Condition.objects.get(id=item_id)
+                return Condition.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -169,4 +166,4 @@ class ItemSerializer(serializers.ModelSerializer):
     condition =  ConditionField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "condition", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+        fields = ["id", "name", "item_type", "condition", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
