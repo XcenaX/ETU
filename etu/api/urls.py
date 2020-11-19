@@ -17,12 +17,17 @@ router.register(r'users', UserViewSet)
 router.register(r'item_types', TypeViewSet)
 router.register(r'roles', RoleViewSet)
 router.register(r'providers', ProviderViewSet)
+router.register(r'documents', DocumentViewSet)
+router.register(r'purchased_items', PurchasedItemViewSet)
+router.register(r'purchases', PurchaseViewSet)
+router.register(r'bags', BagViewSet)
+router.register(r'documents', DocumentViewSet)
 
 #LostItemsNameViewSet
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    
+    #path('<str:filepath>/', views.download_file)
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

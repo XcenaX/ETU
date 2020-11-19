@@ -42,7 +42,10 @@ class UserSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         try:
-            User.objects.get(email=validated_data["email"])
+            user = User.objects.filter(email=validated_data["email"]).first()
+            if user:
+                raise Exception
+            
         except:
             raise serializers.ValidationError("User alredy exist")
         user = User.objects.create(
@@ -52,6 +55,9 @@ class UserSerializer(serializers.ModelSerializer):
         )
         #user.password = validated_data['password']
         user.save()
+        if user.role.name == "purchasing department admin":
+            bag = Bag.objects.create(owner=user)
+            bag.save()
         return user
 
 class AddressField(serializers.RelatedField):
@@ -166,7 +172,81 @@ class ItemSerializer(serializers.ModelSerializer):
     provider = ProviderField(many=False, read_only=False)
     address = AddressField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
-    condition =  ConditionField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "condition", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
+        fields = ["id", "name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
+
+class ItemField(serializers.RelatedField):    
+    queryset = Item.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Item.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+class UserField(serializers.RelatedField):    
+    queryset = User.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return User.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+
+class DocumentSerializer(serializers.ModelSerializer):    
+    condition = ConditionField(many=False, read_only=False)
+    class Meta:
+        model = Document
+        fields = ["id", "condition", "date", "image"]
+
+
+class PurchasedItemSerializer(serializers.ModelSerializer):    
+    item = ItemField(many=False, read_only=False)
+    user = UserField(many=False, read_only=False)
+    document = DocumentSerializer(many=False, read_only=False)
+    class Meta:
+        model = Purchased_Item
+        fields = ["id", "item", "user", "document", "count"]
+
+
+
+class PurchaseSerializer(serializers.ModelSerializer):    
+    purchased_items = PurchasedItemSerializer(many=True, read_only=False)
+    owner = UserSerializer(many=False, read_only=False)
+    class Meta:
+        model = Purchase
+        fields = ["id", "purchase_start_date", "purchase_end_date", "owner", "purchased_items"]
+
+
+class BagSerializer(serializers.ModelSerializer):    
+    items = PurchasedItemSerializer(many=True, read_only=False)
+    owner = UserSerializer(many=False, read_only=False)
+    class Meta:
+        model = Bag
+        fields = [ "items", "owner"]

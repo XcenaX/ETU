@@ -13,9 +13,9 @@ class User(models.Model):
     email = models.TextField(default='') 
     password = models.TextField(default='')
     role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
-
+    company_name = models.TextField(default='') 
     def __str__(self):
-        return self.name
+        return self.email
 
 class Provider(models.Model):
     name = models.TextField(default='') 
@@ -44,7 +44,6 @@ class Condition(models.Model):
 class Item(models.Model):
     image = models.ImageField(upload_to="items_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
-    condition = models.ForeignKey(Condition, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
     address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
     order_date = models.DateTimeField(blank=True, null=True)
@@ -56,4 +55,56 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+class Document(models.Model):
+    image = models.ImageField(upload_to="items_documents", blank=True)
+    date = models.DateField(blank=True, null=True)
+    condition = models.ForeignKey(Condition, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.id
+
+class Purchased_Item(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    count = models.IntegerField(null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    document = models.OneToOneField(Document, on_delete=models.CASCADE, blank=True, null=True)
+    def get_total_price(self):
+        return self.item.price * self.count
+
+    def __str__(self):
+        return self.item.name
+
+class Purchase(models.Model):
+    purchased_items = models.ManyToManyField(Purchased_Item, blank=True)
+    purchase_start_date = models.DateTimeField(default=timezone.now)
+    purchase_end_date = models.DateTimeField(blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def total_price(self):
+        price = 0
+        for purchased_item in self.purchased_items.all():
+            price += purchased_item.get_total_price()
+
+    def __str__(self):
+        return self.owner.email
+
+class Bag(models.Model):
+    items = models.ManyToManyField(Purchased_Item, blank=True)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    
+    def count_of_items(self):
+        count = 0
+        for purchased_item in self.items.all():
+            count += purchased_item.count
+        return count
+
+    def sum_of_items(self):
+        sum = 0
+        for purchased_item in self.items.all():
+            sum += purchased_item.get_total_price()
+        return sum
+
+    def __str__(self):
+        return self.owner.email
     

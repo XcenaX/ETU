@@ -22,7 +22,7 @@ from rest_framework.filters import SearchFilter
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["id", "name", "item_type", "condition", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
     
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -64,7 +64,7 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["id", "email", "role"]
+    filter_fields = ["email", "role"]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -116,3 +116,95 @@ class RoleViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except:
             raise Http404
+
+class ItemViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+    
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Item.objects.all()
+        try:
+            item = Item.objects.get(id=pk)
+            serializer = ItemSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+class DocumentViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["condition"]
+    
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Document.objects.all()
+        try:
+            item = Document.objects.get(id=pk)
+            serializer = DocumentSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+class PurchasedItemViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["user"]
+    
+    queryset = Purchased_Item.objects.all()
+    serializer_class = PurchasedItemSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Purchased_Item.objects.all()
+        try:
+            item = Purchased_Item.objects.get(id=pk)
+            serializer = PurchasedItemSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+
+class PurchaseViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["owner"]
+    
+    queryset = Purchase.objects.all()
+    serializer_class = PurchaseSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Purchase.objects.all()
+        try:
+            item = Purchase.objects.get(id=pk)
+            serializer = PurchaseSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+
+class BagViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["owner"]
+    
+    queryset = Bag.objects.all()
+    serializer_class = BagSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Bag.objects.all()
+        try:
+            item = Bag.objects.get(id=pk)
+            serializer = BagSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+def download_file(request):
+    fl_path = '/file/path'
+    filename = 'downloaded_file_name.extension'
+
+    fl = open(fl_path, 'r')
+    mime_type, _ = mimetypes.guess_type(fl_path)
+    response = HttpResponse(fl, content_type=mime_type)
+    response['Content-Disposition'] = "attachment; filename=%s" % filename
+    return response
