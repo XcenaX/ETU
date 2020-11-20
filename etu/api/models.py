@@ -3,6 +3,8 @@ from django.conf import settings
 from django.utils import timezone
 import os
 
+DEFAULT_CONDITION_ID = 1
+
 class Role(models.Model):
     name = models.TextField(default='') 
 
@@ -57,12 +59,12 @@ class Item(models.Model):
         return self.name
 
 class Document(models.Model):
-    image = models.ImageField(upload_to="items_documents", blank=True)
+    image = models.FileField(upload_to="items_documents", blank=True)
     date = models.DateField(blank=True, null=True)
-    condition = models.ForeignKey(Condition, on_delete=models.CASCADE)
+    condition = models.ForeignKey(Condition, on_delete=models.CASCADE, default=DEFAULT_CONDITION_ID)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class Purchased_Item(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
@@ -76,9 +78,9 @@ class Purchased_Item(models.Model):
         return self.item.name
 
 class Purchase(models.Model):
-    purchased_items = models.ManyToManyField(Purchased_Item, blank=True)
+    purchased_items = models.ManyToManyField(Purchased_Item, blank=True, null=True)
     purchase_start_date = models.DateTimeField(default=timezone.now)
-    purchase_end_date = models.DateTimeField(blank=True)
+    purchase_end_date = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def total_price(self):

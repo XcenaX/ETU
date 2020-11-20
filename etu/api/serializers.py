@@ -6,7 +6,8 @@ import base64
 import six
 import uuid
 from django.contrib.auth.hashers import make_password
-
+from django.http import Http404, JsonResponse
+import json
 
 class RoleField(serializers.RelatedField):
     queryset = Role.objects.all()
@@ -226,22 +227,87 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = ["id", "condition", "date", "image"]
 
 
+class DocumentField(serializers.RelatedField):    
+    queryset = Document.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Document.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+
 class PurchasedItemSerializer(serializers.ModelSerializer):    
     item = ItemField(many=False, read_only=False)
     user = UserField(many=False, read_only=False)
-    document = DocumentSerializer(many=False, read_only=False)
+    document = DocumentField(many=False, read_only=False, required=False)
     class Meta:
         model = Purchased_Item
         fields = ["id", "item", "user", "document", "count"]
 
+    def create(self, validated_data):
+        item = Purchased_Item.objects.create(
+            user=validated_data['user'],
+            count = validated_data['count'],
+            item = validated_data['item'],
+            document=Document.objects.create()
+        )
+        
+        item.save()
+        return item
+
+class PurchasedItemField(serializers.RelatedField):    
+    queryset = Purchased_Item.objects.all()
+    def to_representation(self, value):
+        return str(value.id)
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Purchased_Item.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
 
 
 class PurchaseSerializer(serializers.ModelSerializer):    
-    purchased_items = PurchasedItemSerializer(many=True, read_only=False)
-    owner = UserSerializer(many=False, read_only=False)
+    purchased_items = PurchasedItemField(many=True, read_only=False, required=False)
+    owner = UserField(many=False, read_only=False)
     class Meta:
         model = Purchase
         fields = ["id", "purchase_start_date", "purchase_end_date", "owner", "purchased_items"]
+
+    def create(self, validated_data):
+        item = Purchase.objects.create(
+            owner=validated_data['owner'],
+        )
+
+        for element in validated_data["purchased_items"]:
+            item.purchased_items.add(element)
+        
+        
+        item.save()
+        return item
 
 
 class BagSerializer(serializers.ModelSerializer):    

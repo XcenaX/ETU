@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from api.serializers import *
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,10 +15,27 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User as Auth_User
 import secrets
+from django.shortcuts import render
+
+from PyPDF2 import PdfFileWriter, PdfFileReader
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont 
+from reportlab.lib.styles import ParagraphStyle
 
 #from .filters import FoundItemFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+
+from django.views.decorators.csrf import csrf_exempt
+
+from etu.settings import BASE_DIR
+
+import mimetypes
+
+from django.http import HttpResponse, FileResponse
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
@@ -208,3 +225,55 @@ def download_file(request):
     response = HttpResponse(fl, content_type=mime_type)
     response['Content-Disposition'] = "attachment; filename=%s" % filename
     return response
+
+@csrf_exempt
+def fill_document(request):
+    if request.method == "POST":
+        item_id = request.POST["id"]
+        if not item_id: 
+            return JsonResponse({"error": "Parameter id is required!"})
+        item = Purchased_Item.objects.filter(id=item_id).first()
+        if not item:
+            error = "Item with id=" + item_id + " not found!"
+            return JsonResponse({"error": error})
+        
+        fl_path = BASE_DIR + "/media/dogovors/"
+        
+        pdfmetrics.registerFont(TTFont('cmunss', 'media/fonts/cmunss.ttf'))
+        packet = io.BytesIO()
+
+        can = canvas.Canvas(packet, pagesize=letter)
+        can.setFont('cmunss', 12)
+        can.drawString(45, 585, item.item.provider.name)
+        can.drawString(90, 260, str(item.get_total_price()) + "тг")
+        can.drawString(130, 178, item.item.name)
+        can.drawString(85, 158, str(item.count) + " едениц")
+
+        can.save()
+        can.showPage()
+        #packet.seek(0)
+        new_pdf = PdfFileReader(packet)
+
+        existing_pdf = PdfFileReader(open("media/dogovor.pdf", "rb"))
+        output = PdfFileWriter()
+
+        page = existing_pdf.getPage(0)
+        page.mergePage(new_pdf.getPage(0))
+        output.addPage(page)
+
+        document_path = "media/dogovors/" + str(item.id) + ".pdf"
+        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".pdf"
+        
+        filename = str(item.id) + ".pdf"
+
+        outputStream = open(document_path, "wb")
+        output.write(outputStream)
+        outputStream.close()
+
+        item.document.image = document_path
+        item.document.save()
+        return FileResponse(open(absolute_path, 'rb'), content_type='application/pdf')
+    return JsonResponse({"error": "Only POST method is allowed!"})
+
+def test(request):
+    return render(request, "test.html", {})
