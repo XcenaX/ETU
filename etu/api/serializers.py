@@ -271,7 +271,7 @@ class PurchasedItemSerializer(serializers.ModelSerializer):
 class PurchasedItemField(serializers.RelatedField):    
     queryset = Purchased_Item.objects.all()
     def to_representation(self, value):
-        return str(value.id)
+        return value.id
     def to_internal_value(self, data):
         try:
             try:
@@ -316,3 +316,39 @@ class BagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bag
         fields = [ "items", "owner"]
+
+
+class DriverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = [ "id", "phone", "car_number", "fullname"]
+
+
+class DriverField(serializers.RelatedField):    
+    queryset = Driver.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Driver.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+
+class OrderSerializer(serializers.ModelSerializer):    
+    item = ItemField(many=False, read_only=False)
+    driver =  DriverField(many=False, read_only=False)
+    class Meta:
+        model = Order
+        fields = [ "id", "item", "status", "driver", "order_date", "city", "address", "count"]

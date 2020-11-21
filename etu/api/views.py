@@ -37,10 +37,18 @@ import mimetypes
 
 from django.http import HttpResponse, FileResponse
 
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
@@ -53,10 +61,11 @@ class ItemViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
 class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     def retrieve(self, request, pk=None):
         queryset = Type.objects.all()
         try:
@@ -69,7 +78,7 @@ class TypeViewSet(viewsets.ModelViewSet):
 class AddressViewSet(viewsets.ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     def retrieve(self, request, pk=None):
         queryset = Address.objects.all()
         try:
@@ -82,7 +91,7 @@ class AddressViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["email", "role"]
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -98,7 +107,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProviderViewSet(viewsets.ModelViewSet):
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     def retrieve(self, request, pk=None):
         queryset = Provider.objects.all()
         try:
@@ -108,10 +117,11 @@ class ProviderViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
 class ConditionViewSet(viewsets.ModelViewSet):
     queryset = Condition.objects.all()
     serializer_class = ConditionSerializer
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     def retrieve(self, request, pk=None):
         queryset = Condition.objects.all()
         try:
@@ -121,10 +131,11 @@ class ConditionViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-
+    authentication_classes = [CsrfExemptSessionAuthentication]
     def retrieve(self, request, pk=None):
         queryset = Role.objects.all()
         try:
@@ -134,10 +145,11 @@ class RoleViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
@@ -150,10 +162,11 @@ class ItemViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
 class DocumentViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["condition"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
 
@@ -169,7 +182,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 class PurchasedItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["user"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Purchased_Item.objects.all()
     serializer_class = PurchasedItemSerializer
 
@@ -182,11 +195,10 @@ class PurchasedItemViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
-
 class PurchaseViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["owner"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Purchase.objects.all()
     serializer_class = PurchaseSerializer
 
@@ -199,11 +211,10 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
-
 class BagViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filter_fields = ["owner"]
-    
+    authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Bag.objects.all()
     serializer_class = BagSerializer
 
@@ -216,6 +227,39 @@ class BagViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+class DriverViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["fullname", "phone", "car_number"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Driver.objects.all()
+        try:
+            item = Driver.objects.get(id=pk)
+            serializer = DriverSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+class OrderViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["status", "count"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Order.objects.all()
+        try:
+            item = Order.objects.get(id=pk)
+            serializer = OrderSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+@csrf_exempt
 def download_file(request):
     fl_path = '/file/path'
     filename = 'downloaded_file_name.extension'

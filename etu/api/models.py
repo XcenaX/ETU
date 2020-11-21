@@ -109,4 +109,31 @@ class Bag(models.Model):
 
     def __str__(self):
         return self.owner.email
+
+
+class Driver(models.Model):
+    fullname = models.TextField(default="")
+    phone = models.TextField(default="")
+    car_number = models.TextField(default="")
+
+    def __str__(self):
+        return self.fullname
+
+
+class Order(models.Model):
+    status = models.BooleanField(default=False)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    order_date = models.DateField(blank=True, null=True) 
+    city = models.TextField(default="")
+    address = models.TextField(default="")
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    count = models.IntegerField(default=0)
+
+    def __str__(self):
+        responce = self.city + ", " + self.driver.fullname
+        return responce
+
+
+
+
     
