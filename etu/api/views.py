@@ -283,7 +283,7 @@ def fill_document(request):
         
         fl_path = BASE_DIR + "/media/dogovors/"
         
-        pdfmetrics.registerFont(TTFont('cmunss', 'media/fonts/cmunss.ttf'))
+        pdfmetrics.registerFont(TTFont('cmunss', BASE_DIR + '//media//fonts//cmunss.ttf'))
         packet = io.BytesIO()
 
         can = canvas.Canvas(packet, pagesize=letter)
