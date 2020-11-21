@@ -298,7 +298,7 @@ def fill_document(request):
         #packet.seek(0)
         new_pdf = PdfFileReader(packet)
 
-        existing_pdf = PdfFileReader(open("media/dogovor.pdf", "rb"))
+        existing_pdf = PdfFileReader(open( BASE_DIR + "//media//dogovor.pdf", "rb"))
         output = PdfFileWriter()
 
         page = existing_pdf.getPage(0)
