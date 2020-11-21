@@ -310,7 +310,7 @@ def fill_document(request):
         
         filename = str(item.id) + ".pdf"
 
-        outputStream = open(document_path, "wb")
+        outputStream = open(absolute_path, "wb")
         output.write(outputStream)
         outputStream.close()
 
