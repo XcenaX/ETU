@@ -356,7 +356,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class ItemToBuySerializer(serializers.ModelSerializer):    
     provider = ProviderField(many=False, read_only=False)
-    address = AddressField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = ItemToBuy
