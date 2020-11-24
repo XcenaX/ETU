@@ -360,5 +360,5 @@ class ItemToBuySerializer(serializers.ModelSerializer):
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = ItemToBuy
-        fields = ["id", "name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
+        fields = ["id", "name", "item_type", "address", "provider", "price", "count", "weight", "image"]
 
