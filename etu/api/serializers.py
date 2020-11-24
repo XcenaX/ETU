@@ -198,6 +198,27 @@ class ItemField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
+class ItemToBuyField(serializers.RelatedField):    
+    queryset = ItemToBuy.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return ItemToBuy.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
 class UserField(serializers.RelatedField):    
     queryset = User.objects.all()
     def to_representation(self, value):
@@ -250,7 +271,7 @@ class DocumentField(serializers.RelatedField):
 
 
 class PurchasedItemSerializer(serializers.ModelSerializer):    
-    item = ItemField(many=False, read_only=False)
+    item = ItemToBuyField(many=False, read_only=False)
     user = UserField(many=False, read_only=False)
     document = DocumentField(many=False, read_only=False, required=False)
     class Meta:
