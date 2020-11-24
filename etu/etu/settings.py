@@ -141,6 +141,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+CORS_ORIGIN_ALLOW_ALL = True 
+CORS_ALLOW_CREDENTIALS = True
+
 STATIC_URL = '/static/'
 STATIC_ROOT = "/home/itemsapi/ETU/static"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
