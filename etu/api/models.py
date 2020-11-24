@@ -59,7 +59,7 @@ class Item(models.Model):
         return self.name
 
 class Document(models.Model):
-    image = models.FileField(upload_to="items_documents", blank=True)
+    image = models.FileField(upload_to="items_documents", blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     condition = models.ForeignKey(Condition, on_delete=models.CASCADE, default=DEFAULT_CONDITION_ID)
 
