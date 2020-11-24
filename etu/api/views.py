@@ -64,7 +64,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 class ItemToBuyViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "address", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type", "provider", "price", "count", "weight"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = ItemToBuy.objects.all()
     serializer_class = ItemToBuySerializer
