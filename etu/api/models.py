@@ -66,8 +66,19 @@ class Document(models.Model):
     def __str__(self):
         return str(self.id)
 
+class ItemToBuy(models.Model):
+    image = models.ImageField(upload_to="items_to_buy_images", blank=True)
+    item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.TextField(default="")  
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.IntegerField(blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 class Purchased_Item(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    item = models.ForeignKey(ItemToBuy, on_delete=models.CASCADE)
     count = models.IntegerField(null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     document = models.OneToOneField(Document, on_delete=models.CASCADE, blank=True, null=True)
@@ -134,16 +145,7 @@ class Order(models.Model):
         return responce
 
 
-class ItemToBuy(models.Model):
-    image = models.ImageField(upload_to="items_to_buy_images", blank=True)
-    item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
-    name = models.TextField(default="")  
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
-    price = models.IntegerField(blank=True, null=True)
-    weight = models.FloatField(blank=True, null=True)
 
-    def __str__(self):
-        return self.name
 
 
 
