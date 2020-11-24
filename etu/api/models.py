@@ -135,7 +135,7 @@ class Order(models.Model):
 
 
 class ItemToBuy(models.Model):
-    image = models.ImageField(upload_to="items_images", blank=True)
+    image = models.ImageField(upload_to="items_to_buy_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
     address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
