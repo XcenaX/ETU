@@ -300,7 +300,7 @@ def fill_document(request):
         
         fl_path = BASE_DIR + "/media/dogovors/"
         
-        pdfmetrics.registerFont(TTFont('cmunss', BASE_DIR + '/media/fonts/cmunss.ttf'))
+        pdfmetrics.registerFont(TTFont('cmunss', BASE_DIR + '//media//fonts//cmunss.ttf'))
         packet = io.BytesIO()
 
         can = canvas.Canvas(packet, pagesize=letter)
@@ -315,7 +315,7 @@ def fill_document(request):
         #packet.seek(0)
         new_pdf = PdfFileReader(packet)
 
-        existing_pdf = PdfFileReader(open( BASE_DIR + "/media/dogovor.pdf", "rb"))
+        existing_pdf = PdfFileReader(open( BASE_DIR + "//media//dogovor.pdf", "rb"))
         output = PdfFileWriter()
 
         page = existing_pdf.getPage(0)
@@ -323,11 +323,11 @@ def fill_document(request):
         output.addPage(page)
 
         document_path = "media/dogovors/" + str(item.id) + ".pdf"
-        absolute_path = BASE_DIR + "/media/dogovors/" + str(item.id) + ".pdf"
+        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".pdf"
         
         filename = str(item.id) + ".pdf"
 
-        outputStream = open(absolute_path, "w+")
+        outputStream = open(absolute_path, "wb")
         output.write(outputStream)
         outputStream.close()
 
