@@ -140,7 +140,6 @@ class ItemToBuy(models.Model):
     name = models.TextField(default="")  
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
-    count = models.IntegerField(blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
 
     def __str__(self):
