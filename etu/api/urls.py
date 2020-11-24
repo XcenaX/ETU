@@ -11,6 +11,7 @@ from .views import *
 
 router = routers.SimpleRouter()
 router.register(r'items', ItemViewSet)
+router.register(r'items_to_buy', ItemToBuyViewSet)
 router.register(r'conditions', ConditionViewSet)
 router.register(r'addresses', AddressViewSet)
 router.register(r'users', UserViewSet)

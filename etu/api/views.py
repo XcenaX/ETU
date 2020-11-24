@@ -62,6 +62,23 @@ class ItemViewSet(viewsets.ModelViewSet):
             raise Http404
 
 
+class ItemToBuyViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = ItemToBuy.objects.all()
+    serializer_class = ItemToBuySerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = ItemToBuy.objects.all()
+        try:
+            item = ItemToBuy.objects.get(id=pk)
+            serializer = ItemToBuySerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+
 class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer

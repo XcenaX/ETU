@@ -352,3 +352,13 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [ "id", "item", "status", "driver", "order_date", "city", "address", "count"]
+
+
+class ItemToBuySerializer(serializers.ModelSerializer):    
+    provider = ProviderField(many=False, read_only=False)
+    address = AddressField(many=False, read_only=False)
+    item_type = TypeField(many=False, read_only=False)
+    class Meta:
+        model = ItemToBuy
+        fields = ["id", "name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
+
