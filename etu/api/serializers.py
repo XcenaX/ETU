@@ -369,8 +369,8 @@ class DriverField(serializers.RelatedField):
 
 
 class OrderSerializer(serializers.ModelSerializer):    
-    item = ItemField(many=False, read_only=False)
-    driver =  DriverField(many=False, read_only=False)
+    item = ItemField(many=False, read_only=False, required=False)
+    driver =  DriverField(many=False, read_only=False, required=False)
     class Meta:
         model = Order
         fields = [ "id", "item", "status", "driver", "order_date", "city", "address", "count"]
