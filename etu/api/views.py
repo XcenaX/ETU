@@ -163,7 +163,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "receive_date", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type", "receive_date", "rfid", "provider", "price", "count", "weight"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -196,7 +196,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 class PurchasedItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["user"]
+    filter_fields = ["user", "status"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Purchased_Item.objects.all()
     serializer_class = PurchasedItemSerializer

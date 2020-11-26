@@ -174,7 +174,7 @@ class ItemSerializer(serializers.ModelSerializer):
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "receive_date", "provider", "price", "count", "weight", "image"]
+        fields = ["id", "name", "item_type", "receive_date", "rfid", "provider", "price", "count", "weight", "image"]
 
 class ItemField(serializers.RelatedField):    
     queryset = Item.objects.all()
@@ -275,7 +275,7 @@ class PurchasedItemSerializer(serializers.ModelSerializer):
     document = DocumentField(many=False, read_only=False, required=False)
     class Meta:
         model = Purchased_Item
-        fields = ["id", "item", "user", "document", "count"]
+        fields = ["id", "item", "user", "document", "count", "status"]
 
     def create(self, validated_data):
         new_document = Document.objects.create()
