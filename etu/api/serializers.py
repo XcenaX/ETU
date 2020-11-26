@@ -279,6 +279,7 @@ class PurchasedItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         new_document = Document.objects.create()
+        new_document.save()
         item = Purchased_Item.objects.create(
             user=validated_data['user'],
             count = validated_data['count'],
@@ -370,6 +371,7 @@ class DriverField(serializers.RelatedField):
 class OrderSerializer(serializers.ModelSerializer):    
     item = ItemField(many=False, read_only=False, required=False)
     driver =  DriverField(many=False, read_only=False, required=False)
+    address = AddressField(many=False, read_only=False, required=False)
     class Meta:
         model = Order
         fields = [ "id", "item", "status", "driver",  "city", "address", "count"]

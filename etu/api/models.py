@@ -137,7 +137,7 @@ class Order(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     order_date = models.DateField(blank=True, null=True) 
     city = models.TextField(default="")
-    address = models.TextField(default="")
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)
     client_name = models.TextField(default="")
