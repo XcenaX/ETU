@@ -33,6 +33,8 @@ class Type(models.Model):
 
 class Address(models.Model):
     name = models.TextField(default='')
+    latitude = models.DecimalField(decimal_places=6, max_digits=9, blank=True, null=True)
+    longitude = models.DecimalField(decimal_places=6, max_digits=9, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -146,7 +148,7 @@ class Order(models.Model):
 
 
 class Feedback(models.Model):
-    image = models.ImageField(upload_to="feedback_images", blank=True)
+    image = models.ImageField(upload_to="feedback_images", default="empty.png")
     message = models.TextField(default="")
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 

@@ -85,7 +85,7 @@ class AddressField(serializers.RelatedField):
 class AddressSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Address
-        fields = ("id", "name")
+        fields = ("id", "name", "latitude", "longitude")
 
 class TypeField(serializers.RelatedField):    
     queryset = Type.objects.all()

@@ -78,6 +78,7 @@ WSGI_APPLICATION = 'etu.wsgi.application'
 
 
 REST_FRAMEWORK = {
+    'DATE_INPUT_FORMATS': [("%d-%m-%Y")],
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.SearchFilter',
         'django_filters.rest_framework.DjangoFilterBackend',
