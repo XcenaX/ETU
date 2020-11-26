@@ -331,7 +331,7 @@ def set_status(request):
         if not item:
             return JsonResponse("Item with id not found!")
         if item.status is True:
-            return JsonResponse({"error": "эта вещь помечена как доставленная! Повторно этого сделать нельзя!"})
+            return JsonResponse({"error": "This item is already delivered!"})
         item.status = True
         item.save()
 
