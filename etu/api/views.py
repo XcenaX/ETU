@@ -17,13 +17,10 @@ from django.contrib.auth.models import User as Auth_User
 import secrets
 from django.shortcuts import render
 
-from PyPDF2 import PdfFileWriter, PdfFileReader
-import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont 
-from reportlab.lib.styles import ParagraphStyle
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
+from etu.settings import BASE_DIR
 
 #from .filters import FoundItemFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -31,7 +28,6 @@ from rest_framework.filters import SearchFilter
 
 from django.views.decorators.csrf import csrf_exempt
 
-from etu.settings import BASE_DIR
 
 import mimetypes
 
@@ -300,38 +296,20 @@ def fill_document(request):
             error = "Item with id=" + item_id + " not found!"
             return JsonResponse({"error": error})
         
-        fl_path = BASE_DIR + "/media/dogovors/"
-        
-        pdfmetrics.registerFont(TTFont('cmunss', BASE_DIR + '//media//fonts//cmunss.ttf'))
-        packet = io.BytesIO()
+        font = ImageFont.truetype( BASE_DIR + '//media//fonts//cmunss.ttf', 35)
 
-        can = canvas.Canvas(packet, pagesize=letter)
-        can.setFont('cmunss', 12)
-        can.drawString(45, 585, item.item.provider.name)
-        can.drawString(90, 260, str(item.get_total_price()) + "тг")
-        can.drawString(130, 178, item.item.name)
-        can.drawString(85, 158, str(item.count) + " едениц")
+        img = Image.open(BASE_DIR + "//media//dogovor.jpg").convert("RGB")
 
-        can.save()
-        can.showPage()
-        #packet.seek(0)
-        new_pdf = PdfFileReader(packet)
+        draw = ImageDraw.Draw(img)
+        draw.text((135, 415), item.item.provider.name, (0,0,0), font=font)
+        draw.text((254, 1317), str(item.get_total_price()) + "тг", (0,0,0), font=font)
+        draw.text((374, 1545), item.item.name, (0,0,0), font=font)
+        draw.text((234, 1605), str(item.count) + " едениц", (0,0,0), font=font)
 
-        existing_pdf = PdfFileReader(open( BASE_DIR + "//media//dogovor.png", "rb"))
-        output = PdfFileWriter()
-
-        page = existing_pdf.getPage(0)
-        page.mergePage(new_pdf.getPage(0))
-        output.addPage(page)
+        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".jpg"
+        img.save(absolute_path)
 
         document_path = "media/dogovors/" + str(item.id) + ".pdf"
-        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".png"
-        
-        filename = str(item.id) + ".png"
-
-        outputStream = open(absolute_path, "wb")
-        output.write(outputStream)
-        outputStream.close()
 
         item.document.image = document_path
         item.document.save()
