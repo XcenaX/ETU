@@ -39,6 +39,8 @@ from django.http import HttpResponse, FileResponse
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 
+from datetime import datetime
+
 class CsrfExemptSessionAuthentication(SessionAuthentication):
 
     def enforce_csrf(self, request):
@@ -47,7 +49,7 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type",  "receive_date", "provider", "price", "count", "weight"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -165,7 +167,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type", "receive_date", "provider", "price", "count", "weight"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -315,7 +317,7 @@ def fill_document(request):
         #packet.seek(0)
         new_pdf = PdfFileReader(packet)
 
-        existing_pdf = PdfFileReader(open( BASE_DIR + "//media//dogovor.pdf", "rb"))
+        existing_pdf = PdfFileReader(open( BASE_DIR + "//media//dogovor.png", "rb"))
         output = PdfFileWriter()
 
         page = existing_pdf.getPage(0)
@@ -323,9 +325,9 @@ def fill_document(request):
         output.addPage(page)
 
         document_path = "media/dogovors/" + str(item.id) + ".pdf"
-        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".pdf"
+        absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".png"
         
-        filename = str(item.id) + ".pdf"
+        filename = str(item.id) + ".png"
 
         outputStream = open(absolute_path, "wb")
         output.write(outputStream)
@@ -333,8 +335,30 @@ def fill_document(request):
 
         item.document.image = document_path
         item.document.save()
-        return FileResponse(open(absolute_path, 'rb'), content_type='application/pdf')
+        return FileResponse(open(absolute_path, 'rb'), content_type='application/png')
     return JsonResponse({"error": "Only POST method is allowed!"})
 
 def test(request):
     return render(request, "test.html", {})
+
+@csrf_exempt
+def set_status(request):
+    if request.method == "POST":
+        item_to_buy_id = request.POST["id"]
+        
+        if not item_to_buy_id:
+            return JsonResponse({"error": "id parameter required!"})
+        item = Purchased_Item.objects.filter(id=item_to_buy_id).first()
+        
+        if not item:
+            return JsonResponse("Item with id not found!")
+        if item.status is True:
+            return JsonResponse({"error": "эта вещь помечена как доставленная! Повторно этого сделать нельзя!"})
+        item.status = True
+
+        new_item = Item.objects.create(name=item.item.name, item_type=item.item.item_type, receive_date=datetime.now(), provider=item.item.provider, price=item.item.price, count=item.count, weight=item.item.weight)
+        new_item.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"error": request.method + " method not allowed!"})

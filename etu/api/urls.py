@@ -31,6 +31,7 @@ router.register(r'documents', DocumentViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     path("fill_document/", views.fill_document, name="fill_document"),
+    path("set_status/", views.set_status, name="set_status"),
     path("test/", views.test, name="test")
     #path('<str:filepath>/', views.download_file)
 ]

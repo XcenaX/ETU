@@ -47,14 +47,12 @@ class Item(models.Model):
     image = models.ImageField(upload_to="items_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
-    order_date = models.DateTimeField(blank=True, null=True)
     receive_date = models.DateTimeField(blank=True, null=True)
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
     count = models.IntegerField(blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
-
+    rfid = models.TextField(default="")  
     def __str__(self):
         return self.name
 
@@ -73,7 +71,6 @@ class ItemToBuy(models.Model):
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
-
     def __str__(self):
         return self.name
 
@@ -82,6 +79,7 @@ class Purchased_Item(models.Model):
     count = models.IntegerField(null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     document = models.OneToOneField(Document, on_delete=models.CASCADE, blank=True, null=True)
+    status = models.BooleanField(default=False)
     def get_total_price(self):
         return self.item.price * self.count
 
@@ -93,6 +91,7 @@ class Purchase(models.Model):
     purchase_start_date = models.DateTimeField(default=timezone.now)
     purchase_end_date = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
     def total_price(self):
         price = 0
@@ -139,6 +138,7 @@ class Order(models.Model):
     address = models.TextField(default="")
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)
+    client_name = models.TextField(default="")
 
     def __str__(self):
         responce = self.city + ", " + self.driver.fullname

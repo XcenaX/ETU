@@ -171,11 +171,10 @@ class ConditionField(serializers.RelatedField):
 
 class ItemSerializer(serializers.ModelSerializer):    
     provider = ProviderField(many=False, read_only=False)
-    address = AddressField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "address", "order_date", "receive_date", "provider", "price", "count", "weight", "image"]
+        fields = ["id", "name", "item_type", "receive_date", "provider", "price", "count", "weight", "image"]
 
 class ItemField(serializers.RelatedField):    
     queryset = Item.objects.all()
@@ -373,7 +372,7 @@ class OrderSerializer(serializers.ModelSerializer):
     driver =  DriverField(many=False, read_only=False, required=False)
     class Meta:
         model = Order
-        fields = [ "id", "item", "status", "driver", "order_date", "city", "address", "count"]
+        fields = [ "id", "item", "status", "driver",  "city", "address", "count"]
 
 
 class ItemToBuySerializer(serializers.ModelSerializer):    
