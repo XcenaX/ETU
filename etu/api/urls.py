@@ -25,6 +25,7 @@ router.register(r'bags', BagViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'drivers', DriverViewSet)
 router.register(r'documents', DocumentViewSet)
+router.register(r'feedbacks', FeedbackViewSet)
 
 #LostItemsNameViewSet
 

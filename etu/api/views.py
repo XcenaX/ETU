@@ -274,6 +274,22 @@ class OrderViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+class FeedbackViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["message"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = Feedback.objects.all()
+        try:
+            item = Feedback.objects.get(id=pk)
+            serializer = FeedbackSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
 @csrf_exempt
 def download_file(request):
     fl_path = '/file/path'

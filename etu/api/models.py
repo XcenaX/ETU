@@ -145,6 +145,11 @@ class Order(models.Model):
         return responce
 
 
+class Feedback(models.Model):
+    image = models.ImageField(upload_to="feedback_images", blank=True)
+    message = models.TextField(default="")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
 
 
 

@@ -374,6 +374,27 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [ "id", "item", "status", "driver",  "city", "address", "count"]
 
+class OrderField(serializers.RelatedField):    
+    queryset = Order.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Order.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
 
 class ItemToBuySerializer(serializers.ModelSerializer):    
     provider = ProviderField(many=False, read_only=False)
@@ -381,4 +402,10 @@ class ItemToBuySerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemToBuy
         fields = ["id", "name", "item_type", "provider", "price", "weight", "image"]
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    order = OrderField(many=False, read_only=False)
+    class Meta:
+        model = Feedback
+        fields = [ "id", "image", "message", "order"]
 
