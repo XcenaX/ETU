@@ -302,9 +302,9 @@ def fill_document(request):
 
         draw = ImageDraw.Draw(img)
         draw.text((135, 415), item.item.provider.name, (0,0,0), font=font)
-        draw.text((254, 1317), str(item.get_total_price()) + "тг", (0,0,0), font=font)
-        draw.text((374, 1545), item.item.name, (0,0,0), font=font)
-        draw.text((234, 1605), str(item.count) + " едениц", (0,0,0), font=font)
+        draw.text((254, 1307), str(item.get_total_price()) + "тг", (0,0,0), font=font)
+        draw.text((374, 1535), item.item.name, (0,0,0), font=font)
+        draw.text((234, 1595), str(item.count) + " едениц", (0,0,0), font=font)
 
         absolute_path = BASE_DIR + "//media//dogovors//" + str(item.id) + ".jpg"
         img.save(absolute_path)
