@@ -333,6 +333,7 @@ def set_status(request):
         if item.status is True:
             return JsonResponse({"error": "эта вещь помечена как доставленная! Повторно этого сделать нельзя!"})
         item.status = True
+        item.save()
 
         new_item = Item.objects.create(name=item.item.name, item_type=item.item.item_type, receive_date=datetime.now(), provider=item.item.provider, price=item.item.price, count=item.count, weight=item.item.weight, image=item.item.image)
         new_item.save()
