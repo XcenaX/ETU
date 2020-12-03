@@ -64,7 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
 class AddressField(serializers.RelatedField):
     queryset = Address.objects.all()
     def to_representation(self, value):
-        return value.name
+        return value.id
     def to_internal_value(self, data):
         try:
             try:
