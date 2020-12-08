@@ -174,7 +174,7 @@ class ItemSerializer(serializers.ModelSerializer):
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "receive_date", "rfid", "provider", "price", "count", "weight", "image"]
+        fields = ["id", "name", "item_type", "receive_date", "rfid", "provider", "price", "count", "image"]
 
 class ItemField(serializers.RelatedField):    
     queryset = Item.objects.all()
@@ -403,7 +403,7 @@ class ItemToBuySerializer(serializers.ModelSerializer):
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = ItemToBuy
-        fields = ["id", "name", "item_type", "provider", "price", "weight", "image"]
+        fields = ["id", "name", "item_type", "provider", "price", "image", "url_name"]
 
 class FeedbackSerializer(serializers.ModelSerializer):
     order = OrderField(many=False, read_only=False)

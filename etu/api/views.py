@@ -47,7 +47,7 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type",  "receive_date", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type",  "receive_date", "provider", "price", "count"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -64,7 +64,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 class ItemToBuyViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "provider", "price", "weight"]
+    filter_fields = ["name", "item_type", "provider", "price"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = ItemToBuy.objects.all()
     serializer_class = ItemToBuySerializer
@@ -165,7 +165,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
 class ItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["name", "item_type", "receive_date", "rfid", "provider", "price", "count", "weight"]
+    filter_fields = ["name", "item_type", "receive_date", "rfid", "provider", "price", "count"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
@@ -353,7 +353,7 @@ def set_status(request):
         item.status = True
         item.save()
 
-        new_item = Item.objects.create(name=item.item.name, item_type=item.item.item_type, receive_date=datetime.now(), provider=item.item.provider, price=item.item.price, count=item.count, weight=item.item.weight, image=item.item.image)
+        new_item = Item.objects.create(name=item.item.name, item_type=item.item.item_type, receive_date=datetime.now(), provider=item.item.provider, price=item.item.price, count=item.count, image=item.item.image)
         new_item.save()
 
         return JsonResponse({"success": True})
