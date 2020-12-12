@@ -9,6 +9,8 @@ from django.contrib.auth.hashers import make_password
 from django.http import Http404, JsonResponse
 import json
 
+
+
 class RoleField(serializers.RelatedField):
     queryset = Role.objects.all()
     def to_representation(self, value):
@@ -86,6 +88,7 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ("id", "name", "latitude", "longitude")
+    
 
 class TypeField(serializers.RelatedField):    
     queryset = Type.objects.all()
@@ -410,4 +413,3 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = [ "id", "image", "message", "order"]
-

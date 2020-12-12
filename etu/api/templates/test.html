@@ -9,3 +9,15 @@
     <input name="id" value="1" placeholder="Purchase Item ID"/>
     <button type="submit">SEND</button>
 </form>
+
+<form action="/create_address/" method="POST">
+    <span>Добавить адрес</span>
+    <input name="name" value="Сатпаева 25" type="text" placeholder="Address"/>
+    <button type="submit">SEND</button>
+</form>
+
+<form action="/test_file/" method="POST" enctype="multipart/form-data">
+    <span>Тест файла</span>
+    <input name="file" type="file"/>
+    <button type="submit">SEND</button>
+</form>

@@ -33,8 +33,8 @@ class Type(models.Model):
 
 class Address(models.Model):
     name = models.TextField(default='')
-    latitude = models.DecimalField(decimal_places=6, max_digits=9, blank=True, null=True)
-    longitude = models.DecimalField(decimal_places=6, max_digits=9, blank=True, null=True)
+    latitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
+    longitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -75,6 +75,9 @@ class ItemToBuy(models.Model):
     url_name = models.TextField(default="")
     def __str__(self):
         return self.name
+    
+
+print(ItemToBuy._meta.db_table)
 
 class Purchased_Item(models.Model):
     item = models.ForeignKey(ItemToBuy, on_delete=models.CASCADE)
@@ -127,7 +130,8 @@ class Driver(models.Model):
     fullname = models.TextField(default="")
     phone = models.TextField(default="")
     car_number = models.TextField(default="")
-
+    latitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
+    longitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
     def __str__(self):
         return self.fullname
 

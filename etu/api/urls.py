@@ -33,7 +33,9 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     path("fill_document/", views.fill_document, name="fill_document"),
     path("set_status/", views.set_status, name="set_status"),
-    path("test/", views.test, name="test")
+    path("test/", views.test, name="test"),
+    path("get_coords/", views.get_coords, name="get_coords"),
+    path("test_file/", views.test_file, name="test_file"),
     #path('<str:filepath>/', views.download_file)
 ]
 

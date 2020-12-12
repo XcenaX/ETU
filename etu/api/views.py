@@ -16,11 +16,15 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User as Auth_User
 import secrets
 from django.shortcuts import render
-
+from django.core.files import File
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
 from etu.settings import BASE_DIR
+
+from urllib.request import urlopen
+
+import requests
 
 #from .filters import FoundItemFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -28,7 +32,7 @@ from rest_framework.filters import SearchFilter
 
 from django.views.decorators.csrf import csrf_exempt
 
-
+from tempfile import NamedTemporaryFile
 import mimetypes
 
 from django.http import HttpResponse, FileResponse
@@ -36,9 +40,12 @@ from django.http import HttpResponse, FileResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 
 from datetime import datetime
+API_KEY = "AIzaSyCcHCB9lx35nurrIOy2KvphPIvmsflB4mE"
 
+import googlemaps
 
-
+import sqlite3
+import shutil
 class CsrfExemptSessionAuthentication(SessionAuthentication):
 
     def enforce_csrf(self, request):
@@ -357,5 +364,96 @@ def set_status(request):
         new_item.save()
 
         return JsonResponse({"success": True})
+
+    return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+@csrf_exempt
+def get_coords(request):
+    if request.method == "POST":
+        name = ""
+        try:
+            name = request.POST["name"]
+            data = requests.post("https://maps.googleapis.com/maps/api/geocode/json?address=" + name + "&key="+API_KEY)
+            
+            if data.json()["status"] == "ZERO_RESULTS":
+                return JsonResponse({"error": "Not found!"})
+            
+            return JsonResponse({
+                "longitude": data.json()["results"][0]["geometry"]["location"]["lng"],
+                "latitude": data.json()["results"][0]["geometry"]["location"]["lat"]
+                })
+        except Exception as error:
+            print(error)
+            return JsonResponse({"error": str(error)})
+
+    return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+def check_table_names(names):
+    my_table_names = ["name", "image", "price", "item_type", "provider"]
+    for name in my_table_names:
+        if name not in names:
+            return False
+    return True  
+
+@csrf_exempt
+def test_file(request):
+    if request.method == "POST":
+        name = ""
+        
+        file = request.FILES["file"]
+
+        db_file = open("temp_db", "wb")
+        
+        for chunk in file.chunks():
+                db_file.write(chunk)
+        
+        if file.name.endswith(".sqlite3") or file.name.endswith(".sqlite") or file.name.endswith(".db") or file.name.endswith(".sql"):
+            conn = None
+            
+            try:
+                conn = sqlite3.connect(db_file.name)
+                cursor = conn.cursor()
+
+                cursor.execute("select * from items;")
+                rows = cursor.fetchall()
+                table_names = list(map(lambda x: x[0], cursor.description))
+                if not check_table_names(table_names):
+                    return JsonResponse({"error": "Your database file does not match the type of our database!"})
+                
+                for row in rows:
+                    provider = Provider.objects.create(name=row[4])
+                    item_type = Type.objects.create(name=row[5])
+                    item = ItemToBuy.objects.create(name=row[1], price=row[3], provider=provider, item_type=item_type)
+                    img_temp = NamedTemporaryFile(delete=True)
+                    img_temp.write(urlopen(row[2]).read())
+                    img_temp.flush()
+                    item.image.save(f"image_{item.id}.png", File(img_temp))
+                    item.save()
+            except Exception as e:
+                return JsonResponse({
+                    "error": str(e),
+                })
+                print(e)
+            finally:
+                if conn:
+                    conn.close()
+
+
+            return JsonResponse({"names": table_names})
+        elif file.name.endswith(".sql"):
+            print("test")
+        elif file.name.endswith(".ns"):
+            print("test")
+
+        
+        
+        
+        
+        return JsonResponse({
+            "success": True,
+        })
+        
 
     return JsonResponse({"error": request.method + " method not allowed!"})
