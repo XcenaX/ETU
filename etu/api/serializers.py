@@ -346,7 +346,7 @@ class BagSerializer(serializers.ModelSerializer):
 class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
-        fields = [ "id", "phone", "car_number", "fullname"]
+        fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude"]
 
 
 class DriverField(serializers.RelatedField):    
