@@ -70,7 +70,7 @@ class AddressField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                return Address.objects.get(name=data)
+                return Address.objects.get(id=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -139,10 +139,37 @@ class ProviderField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
+class DatabaseConnectionField(serializers.RelatedField):    
+    queryset = DatabaseConnection.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return DatabaseConnection.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+class DatabaseConnectionSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = DatabaseConnection
+        fields = [ "id", "host", "port", "database_name", "user", "password"]
+
 class ProviderSerializer(serializers.ModelSerializer):    
+    database_info = DatabaseConnectionField(many=False, read_only=False)
     class Meta:
         model = Provider
-        fields = ("id", "name")
+        fields = ("id", "name", "database_info")
         
 
 class ConditionSerializer(serializers.ModelSerializer):    
@@ -346,7 +373,7 @@ class BagSerializer(serializers.ModelSerializer):
 class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
-        fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude"]
+        fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude", "company_name"]
 
 
 class DriverField(serializers.RelatedField):    
@@ -370,11 +397,37 @@ class DriverField(serializers.RelatedField):
             'Obj does not exist.'
             )
 
+class OrderStatusField(serializers.RelatedField):    
+    queryset = OrderStatus.objects.all()
+    def to_representation(self, value):
+        return value.id
+    def to_internal_value(self, data):
+        try:
+            try:
+                return OrderStatus.objects.get(id=int(data))
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
+class OrderStatusSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = OrderStatus
+        fields = [ "id", "name"]
 
 class OrderSerializer(serializers.ModelSerializer):    
     item = ItemField(many=False, read_only=False, required=False)
     driver =  DriverField(many=False, read_only=False, required=False)
     address = AddressField(many=False, read_only=False, required=False)
+    status = OrderStatusField(many=False, read_only=False, required=False)
     class Meta:
         model = Order
         fields = [ "id", "item", "status", "driver",  "city", "address", "count"]
@@ -399,6 +452,7 @@ class OrderField(serializers.RelatedField):
             raise serializers.ValidationError(
             'Obj does not exist.'
             )
+
 
 
 class ItemToBuySerializer(serializers.ModelSerializer):    

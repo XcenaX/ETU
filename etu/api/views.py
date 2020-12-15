@@ -44,12 +44,19 @@ API_KEY = "AIzaSyCcHCB9lx35nurrIOy2KvphPIvmsflB4mE"
 
 import googlemaps
 
-import sqlite3
+import mysql.connector
+from mysql.connector import Error
 import shutil
+
+from .modules.hashutils import check_pw_hash, make_pw_hash
+
 class CsrfExemptSessionAuthentication(SessionAuthentication):
 
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
+
+# for order in OrderStatus.objects.all():
+#     order.delete()
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -75,6 +82,23 @@ class ItemToBuyViewSet(viewsets.ModelViewSet):
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = ItemToBuy.objects.all()
     serializer_class = ItemToBuySerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = ItemToBuy.objects.all()
+        try:
+            item = ItemToBuy.objects.get(id=pk)
+            serializer = ItemToBuySerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+
+class OrderStatusViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["name"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = OrderStatus.objects.all()
+    serializer_class = OrderStatusSerializer
 
     def retrieve(self, request, pk=None):
         queryset = ItemToBuy.objects.all()
@@ -299,6 +323,24 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
+
+class DatabaseConnectionViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["host"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = DatabaseConnection.objects.all()
+    serializer_class = DatabaseConnectionSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = DatabaseConnection.objects.all()
+        try:
+            item = DatabaseConnection.objects.get(id=pk)
+            serializer = DatabaseConnectionSerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
+
+
 @csrf_exempt
 def download_file(request):
     fl_path = '/file/path'
@@ -398,62 +440,99 @@ def check_table_names(names):
     return True  
 
 @csrf_exempt
-def test_file(request):
+def fill_database(request):
     if request.method == "POST":
-        name = ""
-        
-        file = request.FILES["file"]
-
-        db_file = open("temp_db", "wb")
-        
-        for chunk in file.chunks():
-                db_file.write(chunk)
-        
-        if file.name.endswith(".sqlite3") or file.name.endswith(".sqlite") or file.name.endswith(".db") or file.name.endswith(".sql"):
-            conn = None
-            
-            try:
-                conn = sqlite3.connect(db_file.name)
-                cursor = conn.cursor()
-
-                cursor.execute("select * from items;")
-                rows = cursor.fetchall()
-                table_names = list(map(lambda x: x[0], cursor.description))
-                if not check_table_names(table_names):
-                    return JsonResponse({"error": "Your database file does not match the type of our database!"})
+        db_host = "remotemysql.com"
+        port = "3306"
+        db_name = "TIdx9NcJTR"
+        user = "TIdx9NcJTR"
+        password = "tnIbzSmeDV"
+        provider_name = request.POST["provider"]
+        connection = None
+        cursor = None
+        try:
+            connection = mysql.connector.connect(host=db_host, database=db_name, user=user, passwd=password, port=port)
+            if connection.is_connected():
+                sql_select_Query = "select * from items"
+                cursor = connection.cursor()
+                cursor.execute(sql_select_Query)
+                records = cursor.fetchall()
                 
-                for row in rows:
-                    provider = Provider.objects.create(name=row[4])
-                    item_type = Type.objects.create(name=row[5])
-                    item = ItemToBuy.objects.create(name=row[1], price=row[3], provider=provider, item_type=item_type)
+
+                
+                for row in records:
+                    print("Id = ", row[0], )
+                    print("Name = ", row[1])
+                    print("Image = ", row[2])
+                    print("Price  = ", row[3])
+                    print("Item type  = ", row[4])
+                    item_type = None
+                    provider = None
+                    if len(Type.objects.filter(name=row[4])) == 0:
+                        Type.objects.create(name=row[4])
+                    if len(Provider.objects.filter(name=provider_name)) == 0:
+                        Provider.objects.create(name=provider_name)
+
+                    item_type = Type.objects.filter(name=row[4]).first()
+                    provider = Provider.objects.filter(name=provider_name).first()
+
+                    item = ItemToBuy.objects.create(name=row[1], price=row[3], item_type=item_type, provider=provider)
+                    
                     img_temp = NamedTemporaryFile(delete=True)
                     img_temp.write(urlopen(row[2]).read())
                     img_temp.flush()
                     item.image.save(f"image_{item.id}.png", File(img_temp))
                     item.save()
-            except Exception as e:
-                return JsonResponse({
-                    "error": str(e),
-                })
-                print(e)
-            finally:
-                if conn:
-                    conn.close()
 
+                    
+                return JsonResponse({"success": item})
 
-            return JsonResponse({"names": table_names})
-        elif file.name.endswith(".sql"):
-            print("test")
-        elif file.name.endswith(".ns"):
-            print("test")
-
-        
-        
-        
-        
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        finally:
+            if connection and cursor:
+                cursor.close()
+                connection.close()
+                print("MySQL connection is closed")        
         return JsonResponse({
             "success": True,
         })
-        
 
+    return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+@csrf_exempt
+def register(request):
+    if request.method == "POST":
+        role_id = request.POST["role"]
+        role = Role.objects.filter(id=role_id).first()
+        email = request.POST["email"]
+        password = request.POST["password"]
+        company_name = request.POST["company"]
+
+        if len(User.objects.filter(email=email)) > 0:
+            return JsonResponse({"error": "User with this email already exist!"})
+        user = User.objects.create(email=email, role=role, password=password, company_name=company_name)
+        user.save()
+        return JsonResponse({"success": True}) 
+
+    return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+@csrf_exempt
+def login(request):
+    if request.method == "POST":
+        email = request.POST["email"]
+        password = request.POST["password"]
+        users = User.objects.filter(email=email)
+        if len(users) == 0:
+            return JsonResponse({"error": "User with this email doesn't exist!"})
+        user = users.first()
+
+        if check_pw_hash(password, user.password):
+            return JsonResponse({
+                "success": True,
+                "user": user,
+            }) 
+        return JsonResponse({"error": "Incorrect email or password!"})        
     return JsonResponse({"error": request.method + " method not allowed!"})

@@ -26,8 +26,8 @@ router.register(r'orders', OrderViewSet)
 router.register(r'drivers', DriverViewSet)
 router.register(r'documents', DocumentViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
-
-#LostItemsNameViewSet
+router.register(r'order_statuses', OrderStatusViewSet)
+router.register(r'database_connections', DatabaseConnectionViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -35,12 +35,8 @@ urlpatterns = [
     path("set_status/", views.set_status, name="set_status"),
     path("test/", views.test, name="test"),
     path("get_coords/", views.get_coords, name="get_coords"),
-    path("test_file/", views.test_file, name="test_file"),
+    path("fill_database/", views.fill_database, name="fill_database"),
     #path('<str:filepath>/', views.download_file)
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
-
-
-
-    

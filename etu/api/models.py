@@ -19,8 +19,19 @@ class User(models.Model):
     def __str__(self):
         return self.email
 
+class DatabaseConnection(models.Model):
+    host = models.TextField(default='') 
+    port = models.TextField(default='') 
+    database_name = models.TextField(default='') 
+    user = models.TextField(default='') 
+    password = models.TextField(default='') 
+    
+    def __str__(self):
+        return self.host
+
 class Provider(models.Model):
     name = models.TextField(default='') 
+    database_info = models.ForeignKey(DatabaseConnection, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -132,12 +143,21 @@ class Driver(models.Model):
     car_number = models.TextField(default="")
     latitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
     longitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
+    company_name = models.TextField(default="")
     def __str__(self):
         return self.fullname
 
+class OrderStatus(models.Model):
+    name = models.TextField(default="")
+
+    def __str__(self):
+        return self.name
+
+
+
 
 class Order(models.Model):
-    status = models.BooleanField(default=False)
+    status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     order_date = models.DateField(blank=True, null=True) 
     city = models.TextField(default="")
