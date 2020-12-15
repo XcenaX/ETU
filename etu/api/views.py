@@ -293,7 +293,7 @@ class DriverViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["status", "count"]
+    filter_fields = ["status", "count", "driver"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
