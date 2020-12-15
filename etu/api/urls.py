@@ -36,6 +36,8 @@ urlpatterns = [
     path("test/", views.test, name="test"),
     path("get_coords/", views.get_coords, name="get_coords"),
     path("fill_database/", views.fill_database, name="fill_database"),
+    path("login/", views.login, name="login"),
+    path("register/", views.register, name="register"),
     #path('<str:filepath>/', views.download_file)
 ]
 

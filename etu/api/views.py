@@ -512,7 +512,7 @@ def register(request):
 
         if len(User.objects.filter(email=email)) > 0:
             return JsonResponse({"error": "User with this email already exist!"})
-        user = User.objects.create(email=email, role=role, password=password, company_name=company_name)
+        user = User.objects.create(email=email, role=role, password=make_pw_hash(password), company_name=company_name)
         user.save()
         return JsonResponse({"success": True}) 
 
@@ -528,11 +528,17 @@ def login(request):
         if len(users) == 0:
             return JsonResponse({"error": "User with this email doesn't exist!"})
         user = users.first()
-
+        print(password)
+        print(user.password)
         if check_pw_hash(password, user.password):
             return JsonResponse({
                 "success": True,
-                "user": user,
+                "user":{
+                    "id": user.id,
+                    "email": user.email,
+                    "role_id": user.role.id,
+                    "role": user.role.name,
+                },
             }) 
         return JsonResponse({"error": "Incorrect email or password!"})        
     return JsonResponse({"error": request.method + " method not allowed!"})

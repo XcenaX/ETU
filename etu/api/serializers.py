@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 import base64
 import six
 import uuid
-from django.contrib.auth.hashers import make_password
+from .modules.hashutils import make_pw_hash
 from django.http import Http404, JsonResponse
 import json
 
@@ -54,7 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             role=validated_data['role'],
             email=validated_data['email'],
-            password = make_password(validated_data['password'])
+            password = make_pw_hash(validated_data['password'])
         )
         #user.password = validated_data['password']
         user.save()
