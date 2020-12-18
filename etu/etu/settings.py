@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'etu.wsgi.application'
 
 
 REST_FRAMEWORK = {
-    'DATE_INPUT_FORMATS': [("%d-%m-%Y")],
+    'DATETIME_FORMAT': "%m/%d/%Y %H:%M:%S",
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.SearchFilter',
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -94,8 +94,7 @@ DATABASES = {
         'NAME': str(os.path.join(BASE_DIR, "db.sqlite3")),
     }
 }
-
-
+ 
 
 # DATABASES = {
 #      'default': {
