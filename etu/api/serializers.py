@@ -1,13 +1,13 @@
 from .models import *
 from rest_framework import serializers
-
+from django.core.serializers import serialize
 from django.core.files.base import ContentFile
 import base64
 import six
 import uuid
 from .modules.hashutils import make_pw_hash
 from django.http import Http404, JsonResponse
-import json
+#import json
 
 
 
@@ -66,7 +66,8 @@ class UserSerializer(serializers.ModelSerializer):
 class AddressField(serializers.RelatedField):
     queryset = Address.objects.all()
     def to_representation(self, value):
-        return value.id
+        address = Address.objects.get(id=value.id)
+        return serialize("json", [address])
     def to_internal_value(self, data):
         try:
             try:
@@ -209,7 +210,8 @@ class ItemSerializer(serializers.ModelSerializer):
 class ItemField(serializers.RelatedField):    
     queryset = Item.objects.all()
     def to_representation(self, value):
-        return value.id
+        item = Item.objects.get(id=value.id)
+        return serialize("json", [item])
     def to_internal_value(self, data):
         try:
             try:
@@ -379,7 +381,8 @@ class DriverSerializer(serializers.ModelSerializer):
 class DriverField(serializers.RelatedField):    
     queryset = Driver.objects.all()
     def to_representation(self, value):
-        return value.id
+        driver =  Driver.objects.get(id=value.id)
+        return serialize( "json", [driver] )
     def to_internal_value(self, data):
         try:
             try:
@@ -400,7 +403,7 @@ class DriverField(serializers.RelatedField):
 class OrderStatusField(serializers.RelatedField):    
     queryset = OrderStatus.objects.all()
     def to_representation(self, value):
-        return value.id
+        return value.name
     def to_internal_value(self, data):
         try:
             try:
