@@ -7,7 +7,7 @@ import six
 import uuid
 from .modules.hashutils import make_pw_hash
 from django.http import Http404, JsonResponse
-#import json
+import json
 
 
 
@@ -71,7 +71,9 @@ class AddressField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                return Address.objects.get(id=data)
+                obj = json.loads(data)
+                return Address.objects.get(id=obj[0]["pk"])
+                #return Address.objects.get(id=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -119,26 +121,6 @@ class TypeSerializer(serializers.ModelSerializer):
         model = Type
         fields = ("id", "name")
 
-class ProviderField(serializers.RelatedField):    
-    queryset = Provider.objects.all()
-    def to_representation(self, value):
-        return value.name
-    def to_internal_value(self, data):
-        try:
-            try:
-                return Provider.objects.get(name=data)
-            except KeyError:
-                raise serializers.ValidationError(
-                    'id is a required field.'
-                )
-            except ValueError:
-                raise serializers.ValidationError(
-                    'id must be an integer.'
-                )
-        except Type.DoesNotExist:
-            raise serializers.ValidationError(
-            'Obj does not exist.'
-            )
 
 class DatabaseConnectionField(serializers.RelatedField):    
     queryset = DatabaseConnection.objects.all()
@@ -166,11 +148,7 @@ class DatabaseConnectionSerializer(serializers.ModelSerializer):
         model = DatabaseConnection
         fields = [ "id", "host", "port", "database_name", "user", "password"]
 
-class ProviderSerializer(serializers.ModelSerializer):    
-    database_info = DatabaseConnectionField(many=False, read_only=False)
-    class Meta:
-        model = Provider
-        fields = ("id", "name", "database_info")
+
         
 
 class ConditionSerializer(serializers.ModelSerializer):    
@@ -201,7 +179,6 @@ class ConditionField(serializers.RelatedField):
 
 
 class ItemSerializer(serializers.ModelSerializer):    
-    provider = ProviderField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = Item
@@ -215,7 +192,8 @@ class ItemField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                return Item.objects.get(id=int(data))
+                obj = json.loads(data)
+                return Item.objects.get(id=obj[0]["pk"])
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -386,7 +364,9 @@ class DriverField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                return Driver.objects.get(id=int(data))
+                obj = json.loads(data)
+                return Driver.objects.get(id=obj[0]["pk"])
+                #return Driver.objects.get(id=int(data))
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -407,7 +387,7 @@ class OrderStatusField(serializers.RelatedField):
     def to_internal_value(self, data):
         try:
             try:
-                return OrderStatus.objects.get(id=int(data))
+                return OrderStatus.objects.get(name=data)
             except KeyError:
                 raise serializers.ValidationError(
                     'id is a required field.'
@@ -459,7 +439,6 @@ class OrderField(serializers.RelatedField):
 
 
 class ItemToBuySerializer(serializers.ModelSerializer):    
-    provider = ProviderField(many=False, read_only=False)
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = ItemToBuy

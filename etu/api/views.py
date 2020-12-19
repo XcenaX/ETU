@@ -152,18 +152,7 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             raise Http404
 
-class ProviderViewSet(viewsets.ModelViewSet):
-    queryset = Provider.objects.all()
-    serializer_class = ProviderSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication]
-    def retrieve(self, request, pk=None):
-        queryset = Provider.objects.all()
-        try:
-            provider = Provider.objects.get(id=pk)
-            serializer = ProviderSerializer(provider)
-            return Response(serializer.data)
-        except:
-            raise Http404
+
 
 
 class ConditionViewSet(viewsets.ModelViewSet):
@@ -576,4 +565,24 @@ def login(request):
                 },
             }) 
         return JsonResponse({"error": "Incorrect email or password!"})        
+    return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+@csrf_exempt
+def set_database_connection_info(request):
+    if request.method == "POST":
+        host = request.POST["host"]
+        port = request.POST["port"]
+        user = request.POST["user"]
+        password = request.POST["password"]
+        database_name = request.POST["database_name"]
+        user_id = requests.POST["user_id"]
+        user = User.objects.get(id=user_id)
+
+        user.database_info = DatabaseConnection.objects.create(host=host, port=port, database_name=database_name, login=user, password=password)
+        user.database_info.save()
+        user.save()
+
+        return JsonResponse({"success": True}) 
+
     return JsonResponse({"error": request.method + " method not allowed!"})

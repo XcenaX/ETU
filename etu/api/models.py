@@ -11,30 +11,27 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
-class User(models.Model):
-    email = models.TextField(default='') 
-    password = models.TextField(default='')
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
-    company_name = models.TextField(default='') 
-    def __str__(self):
-        return self.email
-
 class DatabaseConnection(models.Model):
     host = models.TextField(default='') 
     port = models.TextField(default='') 
     database_name = models.TextField(default='') 
-    user = models.TextField(default='') 
+    login = models.TextField(default='') 
     password = models.TextField(default='') 
     
     def __str__(self):
         return self.host
 
-class Provider(models.Model):
-    name = models.TextField(default='') 
+class User(models.Model):
+    email = models.TextField(default='') 
+    password = models.TextField(default='')
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
+    company_name = models.TextField(default='') 
     database_info = models.ForeignKey(DatabaseConnection, on_delete=models.CASCADE, blank=True, null=True)
-
     def __str__(self):
-        return self.name
+        return self.email
+
+
+
 
 class Type(models.Model):
     name = models.TextField(default='')
@@ -61,7 +58,7 @@ class Item(models.Model):
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
     receive_date = models.DateTimeField(blank=True, null=True)
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
     count = models.IntegerField(blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
@@ -81,14 +78,12 @@ class ItemToBuy(models.Model):
     image = models.ImageField(upload_to="items_to_buy_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, blank=True, null=True)
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
     url_name = models.TextField(default="")
     def __str__(self):
         return self.name
     
-
-print(ItemToBuy._meta.db_table)
 
 class Purchased_Item(models.Model):
     item = models.ForeignKey(ItemToBuy, on_delete=models.CASCADE)
@@ -152,8 +147,6 @@ class OrderStatus(models.Model):
 
     def __str__(self):
         return self.name
-
-
 
 
 class Order(models.Model):
