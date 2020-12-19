@@ -383,6 +383,41 @@ def fill_document(request):
         return FileResponse(open(absolute_path, 'rb'), content_type='application/png')
     return JsonResponse({"error": "Only POST method is allowed!"})
 
+@csrf_exempt
+def fill_waybill(request):
+    if request.method == "POST":
+        order_id = request.POST["id"]
+        if not order_id: 
+            return JsonResponse({"error": "Parameter id is required!"})
+        order = Order.objects.filter(id=order_id).first()
+        if not order:
+            error = "Order with id=" + order_id + " not found!"
+            return JsonResponse({"error": error})
+        
+        font = ImageFont.truetype( BASE_DIR + '//media//fonts//cmunss.ttf', 25)
+
+        img = Image.open(BASE_DIR + "//media//nakladnaya.jpg").convert("RGB")
+
+        draw = ImageDraw.Draw(img)
+        draw.text((590, 125), str(order.id), (0,0,0), font=font)
+        draw.text((50, 350), "1", (0,0,0), font=font)
+        draw.text((120, 350), order.item.name, (0,0,0), font=font)
+        draw.text((480, 350), str(order.count), (0,0,0), font=font)
+        draw.text((570, 350), str(order.item.price) + " тг", (0,0,0), font=font)
+        draw.text((700, 350), str(order.get_total_price()) + " тг", (0,0,0), font=font)
+        draw.text((130, 165), order.client_name, (0,0,0), font=font)
+
+        absolute_path = BASE_DIR + "//media//waybills//" + str(order.id) + ".jpg"
+        img.save(absolute_path)
+
+        document_path = "media/waybills/" + str(order.id) + ".pdf"
+        if not order.document:
+            order.document = Document.objects.create()
+        order.document.image = document_path
+        order.document.save()
+        return FileResponse(open(absolute_path, 'rb'), content_type='application/png')
+    return JsonResponse({"error": "Only POST method is allowed!"})
+
 def test(request):
     return render(request, "test.html", {})
 

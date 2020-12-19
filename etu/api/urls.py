@@ -32,6 +32,7 @@ router.register(r'database_connections', DatabaseConnectionViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     path("fill_document/", views.fill_document, name="fill_document"),
+    path("fill_waybill/", views.fill_waybill, name="fill_waybill"),
     path("set_status/", views.set_status, name="set_status"),
     path("test/", views.test, name="test"),
     path("get_coords/", views.get_coords, name="get_coords"),

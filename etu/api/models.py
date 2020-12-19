@@ -165,10 +165,15 @@ class Order(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)
     client_name = models.TextField(default="")
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         responce = self.city + ", " + self.driver.fullname
         return responce
+
+    def get_total_price(self):
+        price = 0
+        return self.count * self.item.price
 
 
 class Feedback(models.Model):
