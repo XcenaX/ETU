@@ -37,11 +37,35 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = ("id", "name")
 
+class DatabaseConnectionField(serializers.RelatedField):    
+    queryset = DatabaseConnection.objects.all()
+    def to_representation(self, value):
+        item = DatabaseConnection.objects.get(id=value.id)
+        return serialize("json", [item])
+    def to_internal_value(self, data):
+        try:
+            try:
+                obj = json.loads(data)
+                return DatabaseConnection.objects.get(id=obj[0]["pk"])
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
 class UserSerializer(serializers.ModelSerializer):
     role = RoleField(many=False, read_only=False)
+    database_info = DatabaseConnectionField()
     class Meta:
         model = User
-        fields = ("id", "email", "password", "role")
+        fields = ("id", "email", "password", "role", "database_info")
     
     def create(self, validated_data):
         try:
@@ -122,26 +146,7 @@ class TypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
-class DatabaseConnectionField(serializers.RelatedField):    
-    queryset = DatabaseConnection.objects.all()
-    def to_representation(self, value):
-        return value.id
-    def to_internal_value(self, data):
-        try:
-            try:
-                return DatabaseConnection.objects.get(id=int(data))
-            except KeyError:
-                raise serializers.ValidationError(
-                    'id is a required field.'
-                )
-            except ValueError:
-                raise serializers.ValidationError(
-                    'id must be an integer.'
-                )
-        except Type.DoesNotExist:
-            raise serializers.ValidationError(
-            'Obj does not exist.'
-            )
+
 
 class DatabaseConnectionSerializer(serializers.ModelSerializer):    
     class Meta:
