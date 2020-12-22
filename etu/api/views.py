@@ -578,7 +578,7 @@ def set_database_connection_info(request):
     if request.method == "POST":
         user_id = request.POST.get("user_id", False)
         print(user_id)
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(id=int(user_id))
         host = request.POST["host"]
         port = request.POST["port"]
         login = request.POST["login"]
