@@ -319,9 +319,10 @@ class DocumentField(serializers.RelatedField):
 class PurchasedItemSerializer(serializers.ModelSerializer):    
     item = ItemToBuyField(many=False, read_only=False)
     document = DocumentField(many=False, read_only=False, required=False)
+    owner = UserField(many=False, read_only=False)
     class Meta:
         model = Purchased_Item
-        fields = ["id", "item", "document", "count", "status"]
+        fields = ["id", "item", "document", "count", "status", "owner"]
 
     def create(self, validated_data):
         new_document = Document.objects.create()

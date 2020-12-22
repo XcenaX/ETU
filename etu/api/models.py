@@ -98,6 +98,7 @@ class Purchased_Item(models.Model):
     count = models.IntegerField(null=True)
     document = models.OneToOneField(Document, on_delete=models.CASCADE, blank=True, null=True)
     status = models.BooleanField(default=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     def get_total_price(self):
         return self.item.price * self.count
 
