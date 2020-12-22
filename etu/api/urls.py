@@ -11,6 +11,7 @@ from .views import *
 
 router = routers.SimpleRouter()
 router.register(r'items', ItemViewSet)
+router.register(r'companies', CompanyViewSet)
 router.register(r'items_to_buy', ItemToBuyViewSet)
 router.register(r'conditions', ConditionViewSet)
 router.register(r'addresses', AddressViewSet)
@@ -35,9 +36,11 @@ urlpatterns = [
     path("set_status/", views.set_status, name="set_status"),
     path("test/", views.test, name="test"),
     path("get_coords/", views.get_coords, name="get_coords"),
-    path("fill_database/", views.fill_database, name="fill_database"),
+    path("get_items/", views.get_items, name="get_items"),
     path("login/", views.login, name="login"),
     path("register/", views.register, name="register"),
+    path("set_connection_info/", views.set_database_connection_info, name="set_connection_info"),
+    
     #path('<str:filepath>/', views.download_file)
 ]
 

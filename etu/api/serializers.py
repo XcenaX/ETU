@@ -10,6 +10,33 @@ from django.http import Http404, JsonResponse
 import json
 
 
+class CompanySerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Company
+        fields = [ "id", "name"]
+
+
+class CompanyField(serializers.RelatedField):
+    queryset = Company.objects.all()
+    def to_representation(self, value):
+        return value.name
+    def to_internal_value(self, data):
+        try:
+            try:
+                return Company.objects.get(name=data)
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        except Type.DoesNotExist:
+            raise serializers.ValidationError(
+            'Obj does not exist.'
+            )
+
 
 class RoleField(serializers.RelatedField):
     queryset = Role.objects.all()
@@ -62,10 +89,11 @@ class DatabaseConnectionField(serializers.RelatedField):
 
 class UserSerializer(serializers.ModelSerializer):
     role = RoleField(many=False, read_only=False)
-    database_info = DatabaseConnectionField()
+    database_info = DatabaseConnectionField(many=False, read_only=False)
+    company = CompanyField(many=False, read_only=False)
     class Meta:
         model = User
-        fields = ("id", "email", "password", "role", "database_info")
+        fields = ("id", "email", "password", "role", "database_info", "company")
     
     def create(self, validated_data):
         try:
@@ -78,7 +106,10 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             role=validated_data['role'],
             email=validated_data['email'],
-            password = make_pw_hash(validated_data['password'])
+            password = make_pw_hash(validated_data['password'],
+            database_info=validated_data["database_info"],
+            company=validated_data["company"]
+            )
         )
         #user.password = validated_data['password']
         user.save()
@@ -187,7 +218,7 @@ class ItemSerializer(serializers.ModelSerializer):
     item_type = TypeField(many=False, read_only=False)
     class Meta:
         model = Item
-        fields = ["id", "name", "item_type", "receive_date", "rfid", "provider", "price", "count", "image"]
+        fields = ["id", "name", "item_type", "receive_date", "rfid", "provider", "price", "count", "image", "weight"]
 
 class ItemField(serializers.RelatedField):    
     queryset = Item.objects.all()
@@ -356,9 +387,10 @@ class BagSerializer(serializers.ModelSerializer):
 
 
 class DriverSerializer(serializers.ModelSerializer):
+    company = CompanyField(many=False, read_only=False)
     class Meta:
         model = Driver
-        fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude", "company_name"]
+        fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude", "company"]
 
 
 class DriverField(serializers.RelatedField):    

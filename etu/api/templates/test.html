@@ -22,9 +22,9 @@
     <button type="submit">SEND</button>
 </form>
 
-<form action="/fill_database/" method="POST" enctype="multipart/form-data">
-    <span>Тест коннекта к базе</span>
-    <input name="provider" placeholder="Провайжер">
+<form action="/get_items/" method="POST" enctype="multipart/form-data">
+    <span>Получить данные с базы поставщика</span>
+    <input name="user_id" placeholder="User ID">
     <button type="submit">SEND</button>
 </form>
 
@@ -32,5 +32,15 @@
     <span>Тест логина</span>
     <input name="email" placeholder="email">
     <input name="password" placeholder="password">
+    <button type="submit">SEND</button>
+</form>
+
+<form action="/set_connection_info/" method="POST" enctype="multipart/form-data">
+    <span>Изменить данные для подключения к базе данных</span>
+    <input name="host" placeholder="host">
+    <input name="port" placeholder="port">
+    <input name="user" placeholder="user">
+    <input name="password" type="password" placeholder="password">
+    <input name="database_name" placeholder="database_name">
     <button type="submit">SEND</button>
 </form>

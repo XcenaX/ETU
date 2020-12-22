@@ -5,6 +5,12 @@ import os
 
 DEFAULT_CONDITION_ID = 1
 
+class Company(models.Model):
+    name = models.TextField(default='') 
+
+    def __str__(self):
+        return self.name
+
 class Role(models.Model):
     name = models.TextField(default='') 
 
@@ -25,7 +31,7 @@ class User(models.Model):
     email = models.TextField(default='') 
     password = models.TextField(default='')
     role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
-    company_name = models.TextField(default='') 
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     database_info = models.ForeignKey(DatabaseConnection, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.email
@@ -99,9 +105,9 @@ class Purchased_Item(models.Model):
 
 class Purchase(models.Model):
     purchased_items = models.ManyToManyField(Purchased_Item, blank=True, null=True)
-    purchase_start_date = models.DateTimeField(default=timezone.now)
-    purchase_end_date = models.DateTimeField(blank=True, null=True)
+    purchase_date = models.DateTimeField(default=timezone.now)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
 
     def total_price(self):
@@ -138,7 +144,7 @@ class Driver(models.Model):
     car_number = models.TextField(default="")
     latitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
     longitude = models.DecimalField(decimal_places=14, max_digits=16, blank=True, null=True)
-    company_name = models.TextField(default="")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.fullname
 

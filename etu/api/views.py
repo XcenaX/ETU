@@ -58,7 +58,21 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 # for order in OrderStatus.objects.all():
 #     order.delete()
 
+class CompanyViewSet(viewsets.ModelViewSet):
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ["name"]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
 
+    def retrieve(self, request, pk=None):
+        queryset = Company.objects.all()
+        try:
+            item = Company.objects.get(id=pk)
+            serializer = CompanySerializer(item)
+            return Response(serializer.data)
+        except:
+            raise Http404
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -466,55 +480,33 @@ def check_table_names(names):
     return True  
 
 @csrf_exempt
-def fill_database(request):
+def get_items(request):
     if request.method == "POST":
-        db_host = "remotemysql.com"
-        port = "3306"
-        db_name = "TIdx9NcJTR"
-        user = "TIdx9NcJTR"
-        password = "tnIbzSmeDV"
-        provider_name = request.POST["provider"]
+        user_id = request.POST["user_id"]
+        user = User.objects.get(id=user_id)
+        host = user.database_info.host
+        port = user.database_info.port
+        login = user.database_info.login
+        password = user.database_info.password
+        database_name = user.database_info.database_name
+
         connection = None
         cursor = None
         try:
-            connection = mysql.connector.connect(host=db_host, database=db_name, user=user, passwd=password, port=port)
+            connection = mysql.connector.connect(host=host, database=database_name, user=login, passwd=password, port=port)
             if connection.is_connected():
                 sql_select_Query = "select * from items"
                 cursor = connection.cursor()
                 cursor.execute(sql_select_Query)
                 records = cursor.fetchall()
-                
-
-                
-                for row in records:
-                    print("Id = ", row[0], )
-                    print("Name = ", row[1])
-                    print("Image = ", row[2])
-                    print("Price  = ", row[3])
-                    print("Item type  = ", row[4])
-                    item_type = None
-                    provider = None
-                    if len(Type.objects.filter(name=row[4])) == 0:
-                        Type.objects.create(name=row[4])
-                    if len(Provider.objects.filter(name=provider_name)) == 0:
-                        Provider.objects.create(name=provider_name)
-
-                    item_type = Type.objects.filter(name=row[4]).first()
-                    provider = Provider.objects.filter(name=provider_name).first()
-
-                    item = ItemToBuy.objects.create(name=row[1], price=row[3], item_type=item_type, provider=provider)
-                    
-                    img_temp = NamedTemporaryFile(delete=True)
-                    img_temp.write(urlopen(row[2]).read())
-                    img_temp.flush()
-                    item.image.save(f"image_{item.id}.png", File(img_temp))
-                    item.save()
-
-                    
-                return JsonResponse({"success": item})
+                cursor.close()
+                connection.close()
+                if len(records) == 0:
+                    return JsonResponse({"error": "Нет таблицы items или она пустая!"})    
+                return JsonResponse({"items": records})
 
         except Error as e:
-            print("Error while connecting to MySQL", e)
+            return JsonResponse({"error": "Не удалось подключиться к базе!"})
         finally:
             if connection and cursor:
                 cursor.close()
@@ -573,15 +565,22 @@ def login(request):
 @csrf_exempt
 def set_database_connection_info(request):
     if request.method == "POST":
-        host = request.POST["host"]
-        port = request.POST["port"]
-        user = request.POST["user"]
-        password = request.POST["password"]
-        database_name = request.POST["database_name"]
         user_id = requests.POST["user_id"]
         user = User.objects.get(id=user_id)
+        host = user.database_info.host
+        port = user.database_info.port
+        login = user.database_info.login
+        password = user.database_info.password
+        database_name = user.database_info.database_name
 
-        user.database_info = DatabaseConnection.objects.create(host=host, port=port, database_name=database_name, login=user, password=password)
+        if not user.database_info:
+            user.database_info = DatabaseConnection.objects.create(host=host, port=port, database_name=database_name, login=login, password=password)
+        else:
+            user.database_info.database_name = database_name
+            user.database_info.login = login
+            user.database_info.password = password
+            user.database_info.port = port
+            user.database_info.host = host
         user.database_info.save()
         user.save()
 
