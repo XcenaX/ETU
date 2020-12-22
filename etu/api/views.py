@@ -516,11 +516,11 @@ def get_items(request):
                 cursor.close()
                 connection.close()
                 if len(records) == 0:
-                    return JsonResponse({"error": "Нет таблицы items или она пустая!"})    
+                    return JsonResponse({"error": "No such table items"})    
                 return JsonResponse({"items": records})
 
         except Error as e:
-            return JsonResponse({"error": "Не удалось подключиться к базе!"})
+            return JsonResponse({"error": "Failed to connect to the database!"})
         finally:
             if connection and cursor:
                 cursor.close()
@@ -606,5 +606,5 @@ def item_delete(sender, instance, **kwargs):
     instance.image.delete(False)
 
 @receiver(pre_delete, sender=Document)
-def item_delete(sender, instance, **kwargs):
+def document_delete(sender, instance, **kwargs):
     instance.image.delete(False)
