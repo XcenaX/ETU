@@ -118,6 +118,8 @@ class UserSerializer(serializers.ModelSerializer):
             bag.save()
         return user
 
+    
+
 class AddressField(serializers.RelatedField):
     queryset = Address.objects.all()
     def to_representation(self, value):
@@ -153,7 +155,6 @@ class TypeField(serializers.RelatedField):
     def to_representation(self, value):
         return value.name
     def to_internal_value(self, data):
-        print(data)
         try:
             try:
                 return Type.objects.get(name=data)

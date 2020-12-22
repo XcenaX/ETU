@@ -22,6 +22,9 @@ from PIL import ImageFont
 from PIL import ImageDraw 
 from etu.settings import BASE_DIR
 
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+
 from urllib.request import urlopen
 
 import requests
@@ -90,6 +93,17 @@ class ItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except:
             raise Http404
+    
+    def destroy(self, request, pk=None):
+        queryset = Item.objects.all()
+        try:
+            item = Item.objects.get(id=pk)
+            os.remove(item.image.path)
+            item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            raise Http404
+        
 
 
 class ItemToBuyViewSet(viewsets.ModelViewSet):
@@ -546,8 +560,7 @@ def login(request):
         if len(users) == 0:
             return JsonResponse({"error": "User with this email doesn't exist!"})
         user = users.first()
-        print(password)
-        print(user.password)
+        
         if check_pw_hash(password, user.password):
             return JsonResponse({
                 "success": True,
@@ -587,3 +600,11 @@ def set_database_connection_info(request):
         return JsonResponse({"success": True}) 
 
     return JsonResponse({"error": request.method + " method not allowed!"})
+
+@receiver(pre_delete, sender=Item)
+def item_delete(sender, instance, **kwargs):
+    instance.image.delete(False)
+
+@receiver(pre_delete, sender=Document)
+def item_delete(sender, instance, **kwargs):
+    instance.image.delete(False)
