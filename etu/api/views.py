@@ -385,7 +385,7 @@ def fill_document(request):
         img = Image.open(BASE_DIR + "//media//dogovor.jpg").convert("RGB")
 
         draw = ImageDraw.Draw(img)
-        draw.text((135, 415), item.item.provider.name, (0,0,0), font=font)
+        draw.text((135, 415), item.item.provider.company.name, (0,0,0), font=font)
         draw.text((254, 1307), str(item.get_total_price()) + "тг", (0,0,0), font=font)
         draw.text((374, 1535), item.item.name, (0,0,0), font=font)
         draw.text((234, 1595), str(item.count) + " едениц", (0,0,0), font=font)
@@ -518,6 +518,7 @@ def get_items(request):
                 return JsonResponse({"items": records})
 
         except Error as e:
+            print(e)
             return JsonResponse({"error": "Failed to connect to the database!"})
         finally:
             if connection and cursor:
