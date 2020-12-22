@@ -534,7 +534,8 @@ def get_items(request):
 @csrf_exempt
 def register(request):
     if request.method == "POST":
-        role_id = request.POST["role"]
+        role_id = request.POST.get("role")
+        print(role_id)
         role = Role.objects.filter(id=role_id).first()
         email = request.POST["email"]
         password = request.POST["password"]
