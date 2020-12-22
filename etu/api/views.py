@@ -540,7 +540,12 @@ def register(request):
         email = request.POST["email"]
         password = request.POST["password"]
         company_name = request.POST["company"]
-        company = Company.objects.get(name=company_name)
+        companies = Company.objects.filter(name=company_name)
+        company = None
+        if len(companies) == 0:
+            company = Company.objects.create(name=company_name)
+        else:
+            company = companies.first()
 
         if len(User.objects.filter(email=email)) > 0:
             return JsonResponse({"error": "User with this email already exist!"})
