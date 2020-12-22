@@ -63,7 +63,7 @@ class Item(models.Model):
     image = models.ImageField(upload_to="items_images", blank=True)
     item_type = models.ForeignKey(Type, on_delete=models.CASCADE, blank=True, null=True)
     name = models.TextField(default="")  
-    receive_date = models.DateTimeField(blank=True, null=True)
+    receive_date = models.DateField(blank=True, null=True)
     provider = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(blank=True, null=True)
     count = models.IntegerField(blank=True, null=True)
@@ -165,6 +165,7 @@ class Order(models.Model):
     count = models.IntegerField(default=0)
     client_name = models.TextField(default="")
     document = models.ForeignKey(Document, on_delete=models.CASCADE, blank=True, null=True)
+    expected_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         responce = self.city + ", " + self.driver.fullname

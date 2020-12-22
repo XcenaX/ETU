@@ -451,7 +451,7 @@ class OrderSerializer(serializers.ModelSerializer):
     status = OrderStatusField(many=False, read_only=False, required=False)
     class Meta:
         model = Order
-        fields = [ "id", "item", "status", "driver",  "city", "address", "count", "client_name"]
+        fields = [ "id", "item", "status", "driver",  "city", "address", "count", "client_name", "expected_date"]
 
 class OrderField(serializers.RelatedField):    
     queryset = Order.objects.all()

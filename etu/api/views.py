@@ -58,8 +58,6 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
 
-# for order in OrderStatus.objects.all():
-#     order.delete()
 
 class CompanyViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
