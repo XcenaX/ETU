@@ -183,7 +183,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class DatabaseConnectionSerializer(serializers.ModelSerializer):    
     class Meta:
         model = DatabaseConnection
-        fields = [ "id", "host", "port", "database_name", "user", "password"]
+        fields = [ "id", "host", "port", "database_name", "login", "password"]
 
 
         
