@@ -327,7 +327,6 @@ class PurchasedItemSerializer(serializers.ModelSerializer):
         new_document = Document.objects.create()
         new_document.save()
         item = Purchased_Item.objects.create(
-            user=validated_data['user'],
             count = validated_data['count'],
             item = validated_data['item'],
             document=new_document

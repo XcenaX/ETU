@@ -246,7 +246,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 class PurchasedItemViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter, DjangoFilterBackend)
-    filter_fields = ["user", "status"]
+    filter_fields = [ "status"]
     authentication_classes = [CsrfExemptSessionAuthentication]
     queryset = Purchased_Item.objects.all()
     serializer_class = PurchasedItemSerializer
