@@ -42,7 +42,7 @@ from django.http import HttpResponse, FileResponse
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 
-from datetime import datetime
+from datetime import datetime, date
 API_KEY = "AIzaSyCcHCB9lx35nurrIOy2KvphPIvmsflB4mE"
 
 import googlemaps
@@ -598,6 +598,15 @@ def set_database_connection_info(request):
         return JsonResponse({"success": True}) 
 
     return JsonResponse({"error": request.method + " method not allowed!"})
+
+
+# @csrf_exempt
+# def add_to_history(request):
+#     if request.method == "POST":
+        
+        
+#     return JsonResponse({"error": request.method + " method not allowed!"})
+
 
 @receiver(pre_delete, sender=Item)
 def item_delete(sender, instance, **kwargs):

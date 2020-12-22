@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 import os
-
+from datetime import date
 DEFAULT_CONDITION_ID = 1
 
 class Company(models.Model):
@@ -94,7 +94,6 @@ class ItemToBuy(models.Model):
 class Purchased_Item(models.Model):
     item = models.ForeignKey(ItemToBuy, on_delete=models.CASCADE)
     count = models.IntegerField(null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     document = models.OneToOneField(Document, on_delete=models.CASCADE, blank=True, null=True)
     status = models.BooleanField(default=False)
     def get_total_price(self):
@@ -105,7 +104,7 @@ class Purchased_Item(models.Model):
 
 class Purchase(models.Model):
     purchased_items = models.ManyToManyField(Purchased_Item, blank=True, null=True)
-    purchase_date = models.DateTimeField(default=timezone.now)
+    purchase_date = models.DateField(default=date.today())
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     
 

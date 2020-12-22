@@ -360,11 +360,11 @@ class PurchasedItemField(serializers.RelatedField):
 
 
 class PurchaseSerializer(serializers.ModelSerializer):    
-    purchased_items = PurchasedItemField(many=True, read_only=False, required=False)
+    purchased_items = ItemField(many=True, read_only=False, required=False)
     owner = UserField(many=False, read_only=False)
     class Meta:
         model = Purchase
-        fields = ["id", "purchase_start_date", "purchase_end_date", "owner", "purchased_items"]
+        fields = ["id", "purchase_date", "owner", "purchased_items"]
 
     def create(self, validated_data):
         item = Purchase.objects.create(
@@ -388,7 +388,7 @@ class BagSerializer(serializers.ModelSerializer):
 
 
 class DriverSerializer(serializers.ModelSerializer):
-    company = CompanyField(many=False, read_only=False)
+    company = CompanyField(many=False, read_only=False, required=False)
     class Meta:
         model = Driver
         fields = [ "id", "phone", "car_number", "fullname", "latitude", "longitude", "company"]
