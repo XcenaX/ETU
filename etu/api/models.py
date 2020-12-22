@@ -91,6 +91,8 @@ class ItemToBuy(models.Model):
         return self.name
     
 
+
+
 class Purchased_Item(models.Model):
     item = models.ForeignKey(ItemToBuy, on_delete=models.CASCADE)
     count = models.IntegerField(null=True)

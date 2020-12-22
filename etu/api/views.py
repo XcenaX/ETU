@@ -576,13 +576,13 @@ def login(request):
 @csrf_exempt
 def set_database_connection_info(request):
     if request.method == "POST":
-        user_id = requests.POST["user_id"]
+        user_id = request.POST["user_id"]
         user = User.objects.get(id=user_id)
-        host = user.database_info.host
-        port = user.database_info.port
-        login = user.database_info.login
-        password = user.database_info.password
-        database_name = user.database_info.database_name
+        host = request.POST["host"]
+        port = request.POST["port"]
+        login = request.POST["login"]
+        password = request.POST["password"]
+        database_name = request.POST["database_name"]
 
         if not user.database_info:
             user.database_info = DatabaseConnection.objects.create(host=host, port=port, database_name=database_name, login=login, password=password)
